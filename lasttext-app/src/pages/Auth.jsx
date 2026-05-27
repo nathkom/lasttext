@@ -48,8 +48,8 @@ export default function Auth() {
             onClick={() => switchMode('signin')}
             style={{
               flex: 1, padding: '8px 0', borderRadius: 8, border: 'none', cursor: 'pointer',
-              background: !isSignUp ? 'var(--fg)' : 'var(--surface-2)',
-              color: !isSignUp ? 'var(--bg)' : 'var(--fg-muted)',
+              background: !isSignUp ? 'var(--ink)' : 'var(--paper-deep)',
+              color: !isSignUp ? 'var(--paper)' : 'var(--ink-muted)',
               fontWeight: 500, fontSize: 14,
             }}
           >
@@ -60,8 +60,8 @@ export default function Auth() {
             onClick={() => switchMode('signup')}
             style={{
               flex: 1, padding: '8px 0', borderRadius: 8, border: 'none', cursor: 'pointer',
-              background: isSignUp ? 'var(--fg)' : 'var(--surface-2)',
-              color: isSignUp ? 'var(--bg)' : 'var(--fg-muted)',
+              background: isSignUp ? 'var(--ink)' : 'var(--paper-deep)',
+              color: isSignUp ? 'var(--paper)' : 'var(--ink-muted)',
               fontWeight: 500, fontSize: 14,
             }}
           >
