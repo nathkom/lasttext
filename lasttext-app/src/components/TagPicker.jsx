@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { supabase, toValue } from '../lib/supabase'
 
+let _channelCounter = 0
+
 /**
  * Pill-button tag selector with:
  *  - real-time updates when other users add tags
@@ -13,6 +15,7 @@ export default function TagPicker({ table, value, onChange, label, hint }) {
   const [newLabel, setNewLabel] = useState('')
   const [error, setError] = useState(null)
   const inputRef = useRef(null)
+  const channelName = useRef(`tags:${table}:${++_channelCounter}`)
 
   useEffect(() => {
     supabase
@@ -23,7 +26,7 @@ export default function TagPicker({ table, value, onChange, label, hint }) {
       .then(({ data }) => setTags(data || []))
 
     const channel = supabase
-      .channel(`tags:${table}`)
+      .channel(channelName.current)
       .on('postgres_changes',
         { event: 'INSERT', schema: 'public', table },
         (payload) => {

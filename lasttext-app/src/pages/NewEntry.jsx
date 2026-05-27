@@ -48,6 +48,15 @@ export default function NewEntry({ session }) {
 
   const update = (k, v) => setForm(prev => ({ ...prev, [k]: v }))
 
+  const updateSender = (v) => {
+    if (!v) return
+    setForm(prev => ({
+      ...prev,
+      sender: v,
+      ...(v === 'me' && { their_apparent_tone_tag_id: null, intent_to_reply_tag_id: null }),
+    }))
+  }
+
   const fillFromLast = () => {
     if (!lastEntry) return
     setForm(prev => ({
@@ -123,7 +132,7 @@ export default function NewEntry({ session }) {
           label="Sender"
           options={[{ value: 'me', label: 'I sent it' }, { value: 'them', label: 'They sent it' }]}
           value={form.sender}
-          onChange={(v) => v && update('sender', v)}
+          onChange={updateSender}
           allowClear={false}
         />
 
@@ -155,8 +164,12 @@ export default function NewEntry({ session }) {
 
         <Scale label="How does this message make you feel?" value={form.your_feeling_valence} onChange={(v) => update('your_feeling_valence', v)} leftLabel="negative" rightLabel="positive" />
         <TagPicker table="feeling_tags" label="Your feeling" value={form.your_feeling_tag_id} onChange={(v) => update('your_feeling_tag_id', v)} />
-        <TagPicker table="feeling_tags" label="Their apparent tone" value={form.their_apparent_tone_tag_id} onChange={(v) => update('their_apparent_tone_tag_id', v)} hint="What the message itself conveys, separate from how you feel." />
-        <TagPicker table="intent_to_reply_tags" label="Do you intend to reply?" value={form.intent_to_reply_tag_id} onChange={(v) => update('intent_to_reply_tag_id', v)} />
+        {form.sender === 'them' && (
+          <TagPicker table="feeling_tags" label="Their apparent tone" value={form.their_apparent_tone_tag_id} onChange={(v) => update('their_apparent_tone_tag_id', v)} hint="What the message itself conveys, separate from how you feel." />
+        )}
+        {form.sender === 'them' && (
+          <TagPicker table="intent_to_reply_tags" label="Do you intend to reply?" value={form.intent_to_reply_tag_id} onChange={(v) => update('intent_to_reply_tag_id', v)} />
+        )}
         <TagPicker table="life_domain_tags" label="Life domain" value={form.life_domain_tag_id} onChange={(v) => update('life_domain_tag_id', v)} />
         <TagPicker table="conversation_topic_tags" label="Conversation topic" value={form.conversation_topic_tag_id} onChange={(v) => update('conversation_topic_tag_id', v)} />
 
