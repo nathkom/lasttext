@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { supabase, PLATFORMS, MESSAGE_TYPES, TIME_OF_DAY, AGE_RELATIVE, CONTACT_FREQUENCY, dayOfWeekFromDate, daysSince } from '../lib/supabase'
 import TagPicker from '../components/TagPicker'
 import PillSelect from '../components/PillSelect'
@@ -28,15 +28,34 @@ const blank = {
   conversation_topic_tag_id: null,
 }
 
+const editableKeys = Object.keys(blank)
+
 export default function NewEntry({ session }) {
   const nav = useNavigate()
+  const { id } = useParams()
+  const isEditing = !!id
+
   const [form, setForm] = useState(blank)
+  const [formLoading, setFormLoading] = useState(isEditing)
   const [submitting, setSubmitting] = useState(false)
   const [toast, setToast] = useState(null)
   const [lastEntry, setLastEntry] = useState(null)
 
-  // Load last entry for "same as last" feature
   useEffect(() => {
+    if (!id) return
+    supabase.from('messages').select('*').eq('id', id).single()
+      .then(({ data, error }) => {
+        if (error || !data || data.user_id !== session.user.id) {
+          nav('/entries')
+          return
+        }
+        setForm(data)
+        setFormLoading(false)
+      })
+  }, [id])
+
+  useEffect(() => {
+    if (isEditing) return
     supabase
       .from('messages')
       .select('*')
@@ -44,7 +63,7 @@ export default function NewEntry({ session }) {
       .order('created_at', { ascending: false })
       .limit(1)
       .then(({ data }) => { if (data && data[0]) setLastEntry(data[0]) })
-  }, [session.user.id])
+  }, [session.user.id, isEditing])
 
   const update = (k, v) => setForm(prev => ({ ...prev, [k]: v }))
 
@@ -81,34 +100,53 @@ export default function NewEntry({ session }) {
     const userName = session.user.user_metadata?.name || session.user.email.split('@')[0]
     const word_count = form.message_text.trim().split(/\s+/).length
     const payload = {
-      ...form,
+      ...Object.fromEntries(editableKeys.map(k => [k, form[k]])),
       user_id: session.user.id,
       user_name: userName,
       word_count,
       days_since_sent: daysSince(form.sent_at),
       sent_day_of_week: dayOfWeekFromDate(form.sent_at),
     }
-    const { error, data } = await supabase.from('messages').insert(payload).select().single()
+
+    let error, data
+    if (isEditing) {
+      const res = await supabase.from('messages').update(payload).eq('id', id).select().single()
+      error = res.error; data = res.data
+    } else {
+      const res = await supabase.from('messages').insert(payload).select().single()
+      error = res.error; data = res.data
+    }
+
     setSubmitting(false)
     if (error) {
       setToast(`Error: ${error.message}`)
       setTimeout(() => setToast(null), 3500)
       return
     }
-    setLastEntry(data)
-    setForm({ ...blank, sent_at: today() })
-    setToast('Entry saved')
-    setTimeout(() => setToast(null), 1800)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+
+    if (isEditing) {
+      setToast('Entry updated')
+      setTimeout(() => { setToast(null); nav('/entries') }, 1200)
+    } else {
+      setLastEntry(data)
+      setForm({ ...blank, sent_at: today() })
+      setToast('Entry saved')
+      setTimeout(() => setToast(null), 1800)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
   }
+
+  if (formLoading) return <main><div className="empty"><p>Loading…</p></div></main>
 
   return (
     <main>
-      <h1>Log a <em>last message</em></h1>
-      <div className="subtitle">single pass · all fields are optional except the message itself</div>
+      <h1>{isEditing ? <>Edit <em>entry</em></> : <>Log a <em>last message</em></>}</h1>
+      <div className="subtitle">
+        {isEditing ? 'update any fields and save' : 'single pass · all fields are optional except the message itself'}
+      </div>
 
       <form onSubmit={submit}>
-        {lastEntry && (
+        {!isEditing && lastEntry && (
           <button type="button" className="btn secondary" onClick={fillFromLast} style={{ marginBottom: 24 }}>
             ⟲ Same relationship fields as last entry
           </button>
@@ -174,9 +212,9 @@ export default function NewEntry({ session }) {
         <TagPicker table="conversation_topic_tags" label="Conversation topic" value={form.conversation_topic_tag_id} onChange={(v) => update('conversation_topic_tag_id', v)} />
 
         <div className="btn-row">
-          <button type="button" className="btn secondary" onClick={() => nav('/')}>Cancel</button>
+          <button type="button" className="btn secondary" onClick={() => nav(isEditing ? '/entries' : '/')}>Cancel</button>
           <button type="submit" className="btn" disabled={!valid || submitting} style={{ flex: 1 }}>
-            {submitting ? 'Saving…' : 'Save entry'}
+            {submitting ? 'Saving…' : isEditing ? 'Save changes' : 'Save entry'}
           </button>
         </div>
       </form>

@@ -69,6 +69,7 @@ export default function App() {
           <Route path="/auth" element={session ? <Navigate to="/" /> : <Auth />} />
           <Route path="/" element={session ? <Dashboard session={session} /> : <Navigate to="/auth" />} />
           <Route path="/new" element={session ? <NewEntry session={session} /> : <Navigate to="/auth" />} />
+          <Route path="/entries/:id/edit" element={session ? <NewEntry session={session} /> : <Navigate to="/auth" />} />
           <Route path="/entries" element={session ? <Entries session={session} /> : <Navigate to="/auth" />} />
         </Routes>
       </ErrorBoundary>
