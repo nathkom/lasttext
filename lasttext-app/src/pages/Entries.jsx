@@ -44,6 +44,7 @@ export default function Entries({ session }) {
   const [rows, setRows] = useState(null)
   const [filter, setFilter] = useState('mine')
   const [expanded, setExpanded] = useState(null)
+  const [sortDir, setSortDir] = useState('desc')
 
   const load = async () => {
     let q = supabase.from('messages').select(`
@@ -56,7 +57,7 @@ export default function Entries({ session }) {
       intent_to_reply_tags(label),
       life_domain_tags(label),
       conversation_topic_tags(label)
-    `).order('sent_at', { ascending: false })
+    `).order('sent_at', { ascending: sortDir === 'asc' })
     if (filter === 'mine') q = q.eq('user_id', session.user.id)
     const { data } = await q
     setRows(data || [])
@@ -68,7 +69,7 @@ export default function Entries({ session }) {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, load)
       .subscribe()
     return () => supabase.removeChannel(ch)
-  }, [filter, session.user.id])
+  }, [filter, sortDir, session.user.id])
 
   const handleDelete = async (id) => {
     if (!confirm('Delete this entry?')) return
@@ -83,9 +84,18 @@ export default function Entries({ session }) {
       <h1>Entries</h1>
       <div className="subtitle">{filter === 'mine' ? 'your entries' : 'all entries (group)'}</div>
 
-      <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
+      <div style={{ display: 'flex', gap: 8, marginBottom: 24, alignItems: 'center' }}>
         <button className={`pill ${filter === 'mine' ? 'selected' : ''}`} onClick={() => setFilter('mine')}>Mine</button>
         <button className={`pill ${filter === 'all' ? 'selected' : ''}`} onClick={() => setFilter('all')}>Everyone</button>
+        <div style={{ marginLeft: 'auto' }}>
+          <button
+            className="pill"
+            onClick={() => setSortDir(d => d === 'desc' ? 'asc' : 'desc')}
+            title="Toggle sort order"
+          >
+            Date {sortDir === 'desc' ? '↓' : '↑'}
+          </button>
+        </div>
       </div>
 
       {rows.length === 0 ? (

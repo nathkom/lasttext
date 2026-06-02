@@ -10,65 +10,54 @@ A small data-collection web app for our group's last-text-message project. Built
   - Row-Level Security: everyone reads everything (shared dataset); users can only modify their own messages
   - Real-time subscriptions enabled on all tag tables + messages
 - **Web app**:
-  - Magic-link auth via Supabase
-  - Dashboard with live group + individual stats
+  - Email + password auth — no magic links, no email required after sign-up
+  - Dashboard with live group + individual stats and per-person contributor breakdown
   - Single-pass entry form, mobile-friendly, pill-button selectors
-  - Live-syncing tag picker — when one teammate adds a new tag (e.g. "on_and_off"), it appears in everyone else's dropdown within a second
+  - Sender-aware form: "Their apparent tone" and "Do you intend to reply?" hidden when you are the sender
+  - Live-syncing tag picker — when one teammate adds a new tag it appears in everyone else's dropdown within a second
   - "Same relationship fields as last entry" shortcut to cut repeated taps
-  - Entries list with filter (mine / everyone) and delete
-  - Auto-computed `word_count`, `sent_day_of_week`, `days_since_sent` on insert
+  - Entries list with mine/everyone filter, click-to-expand detail view, inline edit, and delete
+  - Edit existing entries — full form pre-populated, saves changes back in place
+  - Auto-computed `word_count`, `sent_day_of_week`, `days_since_sent` on insert and edit
 
 ## Running locally
 
-1. Get the anon key from the Supabase dashboard → Project Settings → API → `anon public` key.
+1. The `.env` file in `lasttext-app/` already has the Supabase URL and anon key — no setup needed.
 
-2. Create `.env` in the project root:
-   ```
-   VITE_SUPABASE_URL=https://ywxjvefylvggqmosvhkp.supabase.co
-   VITE_SUPABASE_ANON_KEY=<paste anon key here>
-   ```
-
-3. Install and run:
+2. Install and run:
    ```bash
+   cd lasttext-app
    npm install
    npm run dev
    ```
 
-   Visit http://localhost:5173. Sign up with your school email — Supabase will email you a magic link.
+   Visit http://localhost:5173.
 
-## Before the team meeting
+## For new teammates signing up
 
-A couple of things to flag for the group:
+Use the **Sign up** tab on first use. Enter your first name, email, and a password. You're in immediately — no email confirmation. After that, use **Sign in**.
 
-1. **Magic links require email config in Supabase.** Email auth is enabled by default with Supabase's built-in mailer, which has a low rate limit but works fine for 5 people. If you want, you can plug in a custom SMTP provider later.
+## Field reference
 
-2. **The "+ add tag" pattern is live.** Try this in the demo: have two people open the new-entry form side by side, one adds a tag, watch it appear instantly in the other's dropdown. This is the feature you specifically asked for and it's worth showing off.
+| Field | What it means |
+|---|---|
+| `sender` | Who sent the last message — you or them |
+| `life_domain` | Area of life the conversation belongs to (school, work, family, romance, etc.) |
+| `their_apparent_tone` | The emotional tone of their message, separate from how it makes you feel. Only shown when they sent it. |
+| `intent_to_reply` | Whether you plan to reply. Only shown when they sent it. |
+| `closeness` | 1–5 scale, distant → very close |
+| `your_feeling_valence` | 1–5 scale, negative → positive |
+| `days_since_sent` | Auto-computed from `sent_at` at time of save |
 
-3. **Things deliberately not built yet** (good discussion topics for the meeting):
-   - CSV export. Trivial to add once schema is locked. Supabase has it built into the dashboard too.
-   - Edit-existing-entry. Right now you can delete and re-add. Worth doing if entries take long enough that losing one hurts.
-   - Tag merge / cleanup UI. Probably do this in SQL during the analysis-prep pass rather than in the app.
-   - Real-time "X is logging an entry now" presence. Cute but not necessary.
+## Things not built yet
 
-## Schema cheatsheet
+- CSV export — trivial to add once schema is locked; Supabase dashboard has it built in too (Table Editor → messages → Export as CSV)
+- Tag merge / cleanup UI — easier to do in SQL during the analysis-prep pass
+- Real-time presence ("X is logging now") — nice to have, not necessary
 
-`messages` columns, grouped:
+## CSV export with labels
 
-**Identity & timing**
-`id`, `user_id`, `user_name`, `created_at`
-
-**The message**
-`message_text`, `sender`, `sent_at`, `sent_time_of_day`, `sent_day_of_week`, `platform`, `message_type`, `word_count`, `days_since_sent`
-
-**The relationship** (tag-based, extensible)
-`relation_tag_id`, `closeness`, `how_you_know_tag_id`, `their_age_relative`, `contact_frequency`, `relationship_status_tag_id`
-
-**Feeling & context** (tag-based, extensible)
-`your_feeling_valence`, `your_feeling_tag_id`, `their_apparent_tone_tag_id`, `intent_to_reply_tag_id`, `life_domain_tag_id`, `conversation_topic_tag_id`
-
-## CSV export when ready
-
-In the Supabase dashboard: Table Editor → `messages` → "..." menu → Export as CSV. For joined data with tag labels instead of IDs, run this SQL in the SQL editor:
+Run this in the Supabase SQL editor for a fully-joined export (tag IDs resolved to readable labels):
 
 ```sql
 select
@@ -106,4 +95,22 @@ left join conversation_topic_tags ctt   on ctt.id = m.conversation_topic_tag_id
 order by m.user_name, m.sent_at desc;
 ```
 
-Hit "Download CSV" on the result. Reads cleanly into pandas (`pd.read_csv`) or readr (`read_csv`).
+Hit "Download CSV". Reads cleanly into pandas (`pd.read_csv`) or readr (`read_csv`).
+
+## Schema cheatsheet
+
+`messages` columns, grouped:
+
+**Identity & timing**
+`id`, `user_id`, `user_name`, `created_at`
+
+**The message**
+`message_text`, `sender`, `sent_at`, `sent_time_of_day`, `sent_day_of_week`, `platform`, `message_type`, `word_count`, `days_since_sent`
+
+**The relationship** (tag-based, extensible)
+`relation_tag_id`, `closeness`, `how_you_know_tag_id`, `their_age_relative`, `contact_frequency`, `relationship_status_tag_id`
+
+**Feeling & context** (tag-based, extensible)
+`your_feeling_valence`, `your_feeling_tag_id`, `their_apparent_tone_tag_id`, `intent_to_reply_tag_id`, `life_domain_tag_id`, `conversation_topic_tag_id`
+
+Note: `their_apparent_tone_tag_id` and `intent_to_reply_tag_id` will be null for entries where `sender = 'me'`.
