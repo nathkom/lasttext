@@ -5,6 +5,7 @@ import Auth from './pages/Auth'
 import Dashboard from './pages/Dashboard'
 import NewEntry from './pages/NewEntry'
 import Entries from './pages/Entries'
+import Insights from './pages/Insights'
 
 class ErrorBoundary extends Component {
   state = { error: null }
@@ -33,6 +34,7 @@ function Header({ session, onSignOut }) {
         <Link to="/" className={location.pathname === '/' ? 'active' : ''}>Dashboard</Link>
         <Link to="/new" className={location.pathname === '/new' ? 'active' : ''}>New</Link>
         <Link to="/entries" className={location.pathname === '/entries' ? 'active' : ''}>Entries</Link>
+        <Link to="/insights" className={location.pathname === '/insights' ? 'active' : ''}>Insights</Link>
       </nav>
       <span className="user-chip">
         {userName}
@@ -71,6 +73,7 @@ export default function App() {
           <Route path="/new" element={session ? <NewEntry session={session} /> : <Navigate to="/auth" />} />
           <Route path="/entries/:id/edit" element={session ? <NewEntry session={session} /> : <Navigate to="/auth" />} />
           <Route path="/entries" element={session ? <Entries session={session} /> : <Navigate to="/auth" />} />
+          <Route path="/insights" element={session ? <Insights /> : <Navigate to="/auth" />} />
         </Routes>
       </ErrorBoundary>
     </div>

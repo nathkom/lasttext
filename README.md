@@ -16,9 +16,14 @@ A small data-collection web app for our group's last-text-message project. Built
   - Sender-aware form: "Their apparent tone" and "Do you intend to reply?" hidden when you are the sender
   - Live-syncing tag picker — when one teammate adds a new tag it appears in everyone else's dropdown within a second
   - "Same relationship fields as last entry" shortcut to cut repeated taps
-  - Entries list with mine/everyone filter, click-to-expand detail view, inline edit, and delete
+  - Entries list with mine/everyone filter, date sort, click-to-expand detail view, inline edit, and delete
   - Edit existing entries — full form pre-populated, saves changes back in place
   - Auto-computed `word_count`, `sent_day_of_week`, `days_since_sent` on insert and edit
+  - **Insights** dashboard — a gallery of charts from the data, plus a one-click live CSV export (current data, tag labels resolved) for anyone who wants to analyze it themselves
+- **Analysis workspace** (`analysis/`):
+  - Python notebook gallery of 8 analyses (relationship patterns, NLP sentiment, reflective views)
+  - `fetch_data.py` pulls a clean labeled CSV; `build_notebook.py` regenerates the notebook; `sync_insights.py` publishes the charts to the web app's Insights page
+  - See [analysis/README.md](analysis/README.md)
 
 ## Running locally
 

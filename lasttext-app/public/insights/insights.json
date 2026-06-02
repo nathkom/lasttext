@@ -1,0 +1,91 @@
+{
+  "generated": "2026-06-02",
+  "analyses": [
+    {
+      "kind": "relational",
+      "title": "Who actually gets a reply",
+      "png": "1_reply_gap.png",
+      "takeaway": "Each bar shows how often we plan NOT to reply to a text from that type of person. We leave almost everyone on read \u2014 even close friends about half the time \u2014 and the more distant the person, the less likely we answer."
+    },
+    {
+      "kind": "relational",
+      "title": "Closer people, warmer texts",
+      "png": "2_valence_gradient.png",
+      "takeaway": "Average feeling about the last text (1 = bad, 5 = good) by who sent it. The closer the relationship, the better it tends to feel. Spam and strangers sit at the bottom."
+    },
+    {
+      "kind": "relational",
+      "title": "Texts feel best in the evening",
+      "png": "3_time_of_day.png",
+      "takeaway": "Average feeling by time of day. Evening is the only stretch that feels better than neutral; mornings feel the worst."
+    },
+    {
+      "kind": "NLP",
+      "title": "Can a computer tell how a text made us feel?",
+      "png": "4_vader_vs_human.png",
+      "takeaway": "We had a sentiment model guess each text's mood from its words alone, then compared that to how we actually felt. It barely matches either way (the trend lines are nearly flat) \u2014 the same words can mean very different things depending on who sent them and what came before. Words alone don't capture feeling."
+    },
+    {
+      "kind": "NLP",
+      "title": "What unanswered texts say",
+      "png": "5_reply_words.png",
+      "takeaway": "The most common words across the 126 texts we received and don't plan to answer \u2014 mostly everyday logistics and small talk."
+    },
+    {
+      "kind": "reflective",
+      "title": "Everyone feels differently",
+      "png": "6_emotional_palette.png",
+      "takeaway": "Each bar is one person, split by the feelings they logged. The mixes are clearly different \u2014 there's no single 'normal' way our last texts feel."
+    },
+    {
+      "kind": "relational",
+      "title": "Long texts feel worse",
+      "png": "7_wall_of_text.png",
+      "takeaway": "Average feeling by message length. Short and medium texts feel fine; long (16+ word) last texts dip \u2014 they more often carry bad news, conflict, or over-explaining."
+    },
+    {
+      "kind": "reflective",
+      "title": "Their tone rubs off on us",
+      "png": "8_contagion.png",
+      "takeaway": "When the other person's message feels warm, we feel good; when it's demanding, we feel worse. Their tone carries over to how we feel."
+    },
+    {
+      "kind": "relational",
+      "title": "Who goes silent first?",
+      "png": "9_silent_first.png",
+      "takeaway": "For almost every type of person, it was THEY who sent the last text and we never replied \u2014 we're usually the ones who let the conversation drop. Only family and acquaintances are close to balanced."
+    },
+    {
+      "kind": "relational",
+      "title": "Closeness tracks feeling",
+      "png": "10_closeness_feeling.png",
+      "takeaway": "Each dot is one text. The closer we are to someone, the better their last text tends to make us feel \u2014 a real, moderate link (r = 0.40). Unlike the word-based model, this signal is clearly there."
+    },
+    {
+      "kind": "relational",
+      "title": "What our last texts are about",
+      "png": "11_topics.png",
+      "takeaway": "Bar length is how many; color is how good they feel (red = bad, green = good). Most conversations end mid-logistics or in small talk. Spam is both common and the clear low point."
+    },
+    {
+      "kind": "reflective",
+      "title": "When conversations die",
+      "png": "12_when_die.png",
+      "takeaway": "A grid of when our last texts were sent \u2014 day of week vs time of day. Conversations mostly fizzle in the afternoons, peaking Monday afternoon, not late at night."
+    },
+    {
+      "kind": "reflective",
+      "title": "How long our conversations have been dead",
+      "png": "13_dead_recency.png",
+      "takeaway": "Median time since the last text, by relationship. Our closest silences are recent (friends ~4 months, still recoverable); distant, transactional ones have been dead close to a year."
+    },
+    {
+      "kind": "relational",
+      "title": "How we know the people we last texted",
+      "png": "14_how_known.png",
+      "takeaway": "Where our contacts come from (bar length) and how their last texts feel (color). Overwhelmingly school. People met through mutual friends feel warmest; strangers the coldest."
+    }
+  ],
+  "n_entries": 227,
+  "n_people": 5
+}

@@ -21,3 +21,12 @@ dist-ssr/
 # Logs
 *.log
 npm-debug.log*
+
+# Python analysis
+analysis/.venv/
+analysis/data/
+__pycache__/
+.ipynb_checkpoints/
+
+# Claude Code
+.claude/
